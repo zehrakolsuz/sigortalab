@@ -1,0 +1,6 @@
+# Bilerek eski sürümler sabitlendi: SCA (Trivy) bilinen CVE'leri yakalasın diye.
+Flask==2.2.2
+Werkzeug==2.2.2
+Jinja2==3.1.2
+PyJWT==2.3.0
+requests==2.25.1

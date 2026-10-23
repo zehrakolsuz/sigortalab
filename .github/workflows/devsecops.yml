@@ -1,0 +1,128 @@
+name: DevSecOps Pipeline
+
+# SSDLC kontrolleri: her push ve PR'da kod, bağımlılık, konteyner ve çalışan
+# uygulama güvenlik açısından taranır; bulgular GitHub Security sekmesine ve
+# özet bir rapora düşer.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write   # SARIF yükleyebilmek için
+
+jobs:
+  sast:
+    name: SAST (Semgrep + Bandit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Araçları kur
+        run: pip install semgrep bandit[sarif]
+      - name: Semgrep taraması
+        run: semgrep scan --config "p/python" --config "p/flask" --sarif --output semgrep.sarif || true
+      - name: Bandit taraması
+        run: bandit -r app -f sarif -o bandit.sarif || true
+      - name: Semgrep SARIF yükle
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep
+        if: always()
+      - name: Bulguları sakla
+        uses: actions/upload-artifact@v4
+        with:
+          name: sast-raporlari
+          path: "*.sarif"
+        if: always()
+
+  sca:
+    name: SCA + Konteyner (Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bağımlılık taraması (requirements.txt)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: app
+          format: table
+          output: trivy-sca.txt
+          severity: CRITICAL,HIGH,MEDIUM
+      - name: Yapılandırma / Dockerfile taraması
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: config
+          scan-ref: .
+          format: table
+          output: trivy-config.txt
+      - name: Bulguları sakla
+        uses: actions/upload-artifact@v4
+        with:
+          name: sca-raporlari
+          path: trivy-*.txt
+        if: always()
+
+  dast:
+    name: DAST (OWASP ZAP)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Uygulamayı ayağa kaldır
+        run: |
+          pip install -r app/requirements.txt
+          (cd app && python app.py &)
+          for i in $(seq 1 20); do
+            curl -sf http://127.0.0.1:5000/saglik && break || sleep 1
+          done
+      - name: ZAP baseline taraması
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: http://127.0.0.1:5000
+          fail_action: false
+          allow_issue_writing: false
+
+  dogrulama:
+    name: Zafiyet doğrulama testleri
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r app/requirements.txt -r app/requirements-dev.txt
+      - run: python -m pytest -q tests
+
+  rapor:
+    name: Birleşik güvenlik raporu
+    runs-on: ubuntu-latest
+    needs: [sast, sca]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Bulgu dosyalarını indir
+        uses: actions/download-artifact@v4
+        with:
+          path: bulgular
+      - name: Raporu üret
+        run: python scripts/rapor_uret.py bulgular --cikti guvenlik-raporu.md
+      - name: Raporu özet olarak göster
+        run: cat guvenlik-raporu.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Raporu sakla
+        uses: actions/upload-artifact@v4
+        with:
+          name: guvenlik-raporu
+          path: guvenlik-raporu.md

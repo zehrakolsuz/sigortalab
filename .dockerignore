@@ -1,0 +1,7 @@
+.git
+.github
+tests
+rapor
+*.db
+app/belgeler
+__pycache__

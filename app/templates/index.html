@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block icerik %}
+<h1>Hoş geldiniz{% if kullanici %}, {{ kullanici.kullanici_adi }}{% endif %}</h1>
+<p>Hasar dosyalarınızı buradan takip edebilir, yeni hasar bildirebilirsiniz.</p>
+<p><a href="/belge?dosya=hasar_formu.txt">Kaza tespit tutanağı şablonunu indir</a></p>
+<form action="/ara"><input name="q" placeholder="Poliçe no veya plaka ara"><button>Ara</button></form>
+{% endblock %}

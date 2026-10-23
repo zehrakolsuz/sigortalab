@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.db
+app/belgeler/
+rapor/
+.venv/
+.pytest_cache/

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block icerik %}
+<h1>Yeni hasar bildirimi</h1>
+<form method="post">
+  <label>Poliçe no <input name="police_no"></label>
+  <label>Plaka <input name="plaka"></label>
+  <label>Tahmini tutar (TL) <input name="tutar" type="number"></label>
+  <label>Açıklama <textarea name="aciklama" rows="4"></textarea></label>
+  <button>Gönder</button>
+</form>
+{% endblock %}

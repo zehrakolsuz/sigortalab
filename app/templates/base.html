@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SigortaLab</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; background: #f4f6f8; color: #1d2733; }
+    header { background: #0f3d5c; color: #fff; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; }
+    header a { color: #fff; margin-left: 16px; text-decoration: none; }
+    main { max-width: 820px; margin: 24px auto; background: #fff; padding: 24px; border-radius: 8px; }
+    .uyari { background: #fff3cd; border: 1px solid #e0c36a; padding: 8px 12px; border-radius: 6px; font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; } td, th { padding: 8px; border-bottom: 1px solid #e3e7eb; text-align: left; }
+    input, textarea { width: 100%; padding: 8px; margin: 4px 0 12px; box-sizing: border-box; }
+    button { background: #0f3d5c; color: #fff; border: 0; padding: 10px 18px; border-radius: 6px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>SigortaLab Hasar Portalı</strong>
+    <nav>
+      <a href="/">Ana sayfa</a>
+      <a href="/ara?q=">Ara</a>
+      {% if kullanici %}<a href="/hasarlar">Hasarlarım</a><a href="/cikis">Çıkış</a>{% else %}<a href="/giris">Giriş</a>{% endif %}
+    </nav>
+  </header>
+  <main>
+    <p class="uyari">Bu uygulama kasıtlı olarak açıklıdır, yalnızca eğitim amaçlıdır.</p>
+    {% block icerik %}{% endblock %}
+  </main>
+</body>
+</html>

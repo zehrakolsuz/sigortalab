@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block icerik %}
+<h1>Hasar dosyası #{{ hasar.id }}</h1>
+<table>
+  <tr><th>Poliçe</th><td>{{ hasar.police_no }}</td></tr>
+  <tr><th>Plaka</th><td>{{ hasar.plaka }}</td></tr>
+  <tr><th>Tutar</th><td>{{ hasar.tutar }} TL</td></tr>
+  <tr><th>Durum</th><td>{{ hasar.durum }}</td></tr>
+  <tr><th>Açıklama</th><td>{{ hasar.aciklama | safe }}</td></tr>
+</table>
+{% endblock %}

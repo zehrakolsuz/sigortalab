@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block icerik %}
+<h1>Hasar dosyalarım</h1>
+<p><a href="/hasar/yeni">+ Yeni hasar bildir</a></p>
+<table>
+  <tr><th>No</th><th>Poliçe</th><th>Plaka</th><th>Tutar</th><th>Durum</th></tr>
+  {% for h in hasarlar %}
+  <tr><td><a href="/hasar/{{ h.id }}">#{{ h.id }}</a></td><td>{{ h.police_no }}</td><td>{{ h.plaka }}</td><td>{{ h.tutar }} TL</td><td>{{ h.durum }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

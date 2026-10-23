@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block icerik %}
+<h1>Giriş</h1>
+{% if hata %}<p style="color:#b00020">{{ hata }}</p>{% endif %}
+<form method="post">
+  <label>Kullanıcı adı <input name="kullanici_adi"></label>
+  <label>Şifre <input name="sifre" type="password"></label>
+  <button>Giriş yap</button>
+</form>
+{% endblock %}
